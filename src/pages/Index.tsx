@@ -2,7 +2,7 @@
 import Header from "@/components/Header";
 import StatsCard from "@/components/StatsCard";
 import ResidentTable from "@/components/ResidentTable";
-import { Users, Home, UserCheck, AlertTriangle, TrendingUp, Activity } from "lucide-react";
+import { Users, Home, UserCheck, AlertTriangle, TrendingUp, Activity, CreditCard, DollarSign } from "lucide-react";
 
 const Index = () => {
   return (
@@ -52,6 +52,42 @@ const Index = () => {
           />
         </div>
 
+        {/* Payment Stats Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <StatsCard
+            title="Iuran Terkumpul"
+            value="Rp 19.8M"
+            icon={DollarSign}
+            subtitle="Bulan ini"
+            trend="+8% dari bulan lalu"
+            trendUp={true}
+          />
+          <StatsCard
+            title="Warga Lunas"
+            value="156"
+            icon={CreditCard}
+            subtitle="dari 247 warga"
+            trend="+12 dari bulan lalu"
+            trendUp={true}
+          />
+          <StatsCard
+            title="Belum Bayar"
+            value="78"
+            icon={AlertTriangle}
+            subtitle="warga"
+            trend="-5 dari bulan lalu"
+            trendUp={false}
+          />
+          <StatsCard
+            title="Terlambat"
+            value="13"
+            icon={AlertTriangle}
+            subtitle="warga"
+            trend="-2 dari bulan lalu"
+            trendUp={false}
+          />
+        </div>
+
         {/* Activity Overview */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
           <div className="lg:col-span-2">
@@ -84,8 +120,8 @@ const Index = () => {
                 <p className="text-2xl font-bold text-green-600">+8</p>
               </div>
               <div>
-                <p className="text-sm text-muted-foreground">Tingkat Kehadiran</p>
-                <p className="text-2xl font-bold text-foreground">92%</p>
+                <p className="text-sm text-muted-foreground">Tingkat Pembayaran</p>
+                <p className="text-2xl font-bold text-foreground">63%</p>
               </div>
             </div>
           </div>

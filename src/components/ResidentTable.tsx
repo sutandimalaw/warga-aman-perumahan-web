@@ -1,7 +1,9 @@
 
+import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Eye, Phone, Mail } from "lucide-react";
+import { Eye, Phone, Mail, CreditCard } from "lucide-react";
+import ResidentDetailDialog from "./ResidentDetailDialog";
 
 interface Resident {
   id: number;
@@ -12,6 +14,11 @@ interface Resident {
   status: 'aktif' | 'tidak_aktif' | 'pindah';
   lastSeen: string;
   family_members: number;
+  paymentStatus?: {
+    security: 'paid' | 'unpaid' | 'overdue';
+    cleaning: 'paid' | 'unpaid' | 'overdue';
+    lastPayment: string;
+  };
 }
 
 const mockResidents: Resident[] = [
@@ -23,7 +30,12 @@ const mockResidents: Resident[] = [
     email: "ahmad@email.com",
     status: "aktif",
     lastSeen: "2 jam yang lalu",
-    family_members: 4
+    family_members: 4,
+    paymentStatus: {
+      security: 'paid',
+      cleaning: 'paid',
+      lastPayment: '15 Nov 2024'
+    }
   },
   {
     id: 2,
@@ -33,7 +45,12 @@ const mockResidents: Resident[] = [
     email: "siti@email.com",
     status: "aktif",
     lastSeen: "5 menit yang lalu",
-    family_members: 3
+    family_members: 3,
+    paymentStatus: {
+      security: 'paid',
+      cleaning: 'unpaid',
+      lastPayment: '1 Nov 2024'
+    }
   },
   {
     id: 3,
@@ -43,7 +60,12 @@ const mockResidents: Resident[] = [
     email: "budi@email.com",
     status: "tidak_aktif",
     lastSeen: "3 hari yang lalu",
-    family_members: 2
+    family_members: 2,
+    paymentStatus: {
+      security: 'overdue',
+      cleaning: 'overdue',
+      lastPayment: '15 Sep 2024'
+    }
   },
   {
     id: 4,
@@ -53,7 +75,12 @@ const mockResidents: Resident[] = [
     email: "maya@email.com",
     status: "aktif",
     lastSeen: "1 jam yang lalu",
-    family_members: 5
+    family_members: 5,
+    paymentStatus: {
+      security: 'paid',
+      cleaning: 'paid',
+      lastPayment: '10 Nov 2024'
+    }
   },
   {
     id: 5,
@@ -63,7 +90,12 @@ const mockResidents: Resident[] = [
     email: "rudi@email.com",
     status: "pindah",
     lastSeen: "1 minggu yang lalu",
-    family_members: 1
+    family_members: 1,
+    paymentStatus: {
+      security: 'unpaid',
+      cleaning: 'unpaid',
+      lastPayment: '1 Oct 2024'
+    }
   }
 ];
 
@@ -80,74 +112,116 @@ const getStatusBadge = (status: string) => {
   }
 };
 
+const getPaymentSummaryBadge = (paymentStatus: any) => {
+  if (!paymentStatus) return <Badge variant="secondary">-</Badge>;
+  
+  const { security, cleaning } = paymentStatus;
+  
+  if (security === 'paid' && cleaning === 'paid') {
+    return <Badge className="bg-green-100 text-green-800 hover:bg-green-100">Lunas</Badge>;
+  } else if (security === 'overdue' || cleaning === 'overdue') {
+    return <Badge className="bg-red-100 text-red-800 hover:bg-red-100">Terlambat</Badge>;
+  } else {
+    return <Badge className="bg-yellow-100 text-yellow-800 hover:bg-yellow-100">Belum Lunas</Badge>;
+  }
+};
+
 const ResidentTable = () => {
+  const [selectedResident, setSelectedResident] = useState<Resident | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+
+  const handleViewDetail = (resident: Resident) => {
+    setSelectedResident(resident);
+    setDialogOpen(true);
+  };
+
   return (
-    <div className="bg-card rounded-xl shadow-sm border border-border">
-      <div className="p-6 border-b border-border">
-        <h3 className="text-lg font-semibold text-foreground">Data Warga Terbaru</h3>
-        <p className="text-sm text-muted-foreground mt-1">Monitoring aktivitas dan status warga perumahan</p>
-      </div>
-      
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead className="bg-muted/50">
-            <tr>
-              <th className="text-left p-4 font-medium text-muted-foreground">Nama</th>
-              <th className="text-left p-4 font-medium text-muted-foreground">Alamat</th>
-              <th className="text-left p-4 font-medium text-muted-foreground">Kontak</th>
-              <th className="text-left p-4 font-medium text-muted-foreground">Status</th>
-              <th className="text-left p-4 font-medium text-muted-foreground">Terakhir Terlihat</th>
-              <th className="text-left p-4 font-medium text-muted-foreground">Anggota Keluarga</th>
-              <th className="text-left p-4 font-medium text-muted-foreground">Aksi</th>
-            </tr>
-          </thead>
-          <tbody>
-            {mockResidents.map((resident) => (
-              <tr key={resident.id} className="border-b border-border hover:bg-muted/30 transition-colors">
-                <td className="p-4">
-                  <div>
-                    <p className="font-medium text-foreground">{resident.name}</p>
-                    <p className="text-sm text-muted-foreground">ID: {resident.id.toString().padStart(3, '0')}</p>
-                  </div>
-                </td>
-                <td className="p-4">
-                  <p className="text-foreground">{resident.address}</p>
-                </td>
-                <td className="p-4">
-                  <div className="space-y-1">
-                    <div className="flex items-center space-x-2 text-sm">
-                      <Phone className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-foreground">{resident.phone}</span>
-                    </div>
-                    <div className="flex items-center space-x-2 text-sm">
-                      <Mail className="w-4 h-4 text-muted-foreground" />
-                      <span className="text-muted-foreground">{resident.email}</span>
-                    </div>
-                  </div>
-                </td>
-                <td className="p-4">
-                  {getStatusBadge(resident.status)}
-                </td>
-                <td className="p-4">
-                  <p className="text-sm text-foreground">{resident.lastSeen}</p>
-                </td>
-                <td className="p-4">
-                  <span className="inline-flex items-center justify-center w-8 h-8 bg-green-100 text-green-800 rounded-full text-sm font-medium">
-                    {resident.family_members}
-                  </span>
-                </td>
-                <td className="p-4">
-                  <Button size="sm" variant="outline" className="text-green-600 border-green-200 hover:bg-green-50">
-                    <Eye className="w-4 h-4 mr-1" />
-                    Detail
-                  </Button>
-                </td>
+    <>
+      <div className="bg-card rounded-xl shadow-sm border border-border">
+        <div className="p-6 border-b border-border">
+          <h3 className="text-lg font-semibold text-foreground">Data Warga Terbaru</h3>
+          <p className="text-sm text-muted-foreground mt-1">Monitoring aktivitas dan status warga perumahan</p>
+        </div>
+        
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead className="bg-muted/50">
+              <tr>
+                <th className="text-left p-4 font-medium text-muted-foreground">Nama</th>
+                <th className="text-left p-4 font-medium text-muted-foreground">Alamat</th>
+                <th className="text-left p-4 font-medium text-muted-foreground">Kontak</th>
+                <th className="text-left p-4 font-medium text-muted-foreground">Status</th>
+                <th className="text-left p-4 font-medium text-muted-foreground">Pembayaran</th>
+                <th className="text-left p-4 font-medium text-muted-foreground">Terakhir Terlihat</th>
+                <th className="text-left p-4 font-medium text-muted-foreground">Anggota Keluarga</th>
+                <th className="text-left p-4 font-medium text-muted-foreground">Aksi</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {mockResidents.map((resident) => (
+                <tr key={resident.id} className="border-b border-border hover:bg-muted/30 transition-colors">
+                  <td className="p-4">
+                    <div>
+                      <p className="font-medium text-foreground">{resident.name}</p>
+                      <p className="text-sm text-muted-foreground">ID: {resident.id.toString().padStart(3, '0')}</p>
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <p className="text-foreground">{resident.address}</p>
+                  </td>
+                  <td className="p-4">
+                    <div className="space-y-1">
+                      <div className="flex items-center space-x-2 text-sm">
+                        <Phone className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-foreground">{resident.phone}</span>
+                      </div>
+                      <div className="flex items-center space-x-2 text-sm">
+                        <Mail className="w-4 h-4 text-muted-foreground" />
+                        <span className="text-muted-foreground">{resident.email}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    {getStatusBadge(resident.status)}
+                  </td>
+                  <td className="p-4">
+                    <div className="flex items-center space-x-2">
+                      <CreditCard className="w-4 h-4 text-muted-foreground" />
+                      {getPaymentSummaryBadge(resident.paymentStatus)}
+                    </div>
+                  </td>
+                  <td className="p-4">
+                    <p className="text-sm text-foreground">{resident.lastSeen}</p>
+                  </td>
+                  <td className="p-4">
+                    <span className="inline-flex items-center justify-center w-8 h-8 bg-green-100 text-green-800 rounded-full text-sm font-medium">
+                      {resident.family_members}
+                    </span>
+                  </td>
+                  <td className="p-4">
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      className="text-green-600 border-green-200 hover:bg-green-50"
+                      onClick={() => handleViewDetail(resident)}
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      Detail
+                    </Button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+
+      <ResidentDetailDialog
+        resident={selectedResident}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+      />
+    </>
   );
 };
 
