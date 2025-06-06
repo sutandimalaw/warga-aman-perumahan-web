@@ -1,5 +1,5 @@
 
-import { Users, Home, BarChart3 } from "lucide-react";
+import { Users, Home, BarChart3, CreditCard } from "lucide-react";
 
 const Header = () => {
   return (
@@ -17,13 +17,17 @@ const Header = () => {
           </div>
           
           <nav className="flex items-center space-x-6">
-            <a href="#" className="flex items-center space-x-2 text-green-600 font-medium">
+            <a href="/" className="flex items-center space-x-2 text-green-600 font-medium">
               <BarChart3 className="w-5 h-5" />
               <span>Dashboard</span>
             </a>
             <a href="#" className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors">
               <Users className="w-5 h-5" />
               <span>Data Warga</span>
+            </a>
+            <a href="/payment" className="flex items-center space-x-2 text-muted-foreground hover:text-foreground transition-colors">
+              <CreditCard className="w-5 h-5" />
+              <span>Pembayaran</span>
             </a>
           </nav>
         </div>
